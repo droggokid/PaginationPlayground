@@ -3,6 +3,11 @@ package models
 
 import "encoding/json"
 
+type SearchActivityResponse struct {
+	Total int          `json:"total"`
+	Items []SearchItem `json:"items"`
+}
+
 type SearchResponse struct {
 	Total int          `json:"total"`
 	Items []SearchItem `json:"items"`

@@ -11,8 +11,8 @@ import (
 
 type ItemRepository interface {
 	GetItem(string) ([]models.SearchItem, error)
-	SaveSearchItem(models.SearchItem) error
-	SaveSearchItems([]models.SearchItem) error
+	SaveItem(models.SearchItem) error
+	SaveItems([]models.SearchItem) error
 }
 
 type PostgresItemRepository struct {
@@ -60,7 +60,7 @@ func (r *PostgresItemRepository) GetItem(name string) ([]models.SearchItem, erro
 	return items, nil
 }
 
-func (r *PostgresItemRepository) SaveSearchItem(item models.SearchItem) error {
+func (r *PostgresItemRepository) SaveItem(item models.SearchItem) error {
 	sql := `INSERT INTO search_items (id, name, description, type, type_icon, icon,
 		icon_large, members, current_trend, current_price, today_trend, today_price)
 		    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
@@ -88,7 +88,7 @@ func (r *PostgresItemRepository) SaveSearchItem(item models.SearchItem) error {
 	return err
 }
 
-func (r *PostgresItemRepository) SaveSearchItems(items []models.SearchItem) error {
+func (r *PostgresItemRepository) SaveItems(items []models.SearchItem) error {
 	sql := `INSERT INTO search_items (id, name, description, type, type_icon, icon, 
   		icon_large, members, current_trend, current_price, today_trend, today_price)
 		    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)

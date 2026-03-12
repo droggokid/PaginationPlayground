@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	"PaginationPlayground/internal/client"
+	"PaginationPlayground/internal/handler"
 	"PaginationPlayground/internal/persist"
+	"PaginationPlayground/internal/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -23,26 +23,14 @@ func main() {
 
 	dbContext := persist.NewDatabaseContext(ctx, os.Getenv("DB_URL"))
 	itemRepo := persist.NewItemRepository(dbContext)
-	client := client.NewOSRSClient(itemRepo)
+	itemClient := client.NewOsrsClient()
+	itemService := service.NewOsrsService(itemRepo, itemClient)
+	itemHandler := handler.NewOsrsHandler(itemService)
 	r := gin.Default()
 
-	r.GET("/populate-db", func(c *gin.Context) {
-		err := client.FetchAndPersistItems(c)
-		if err != nil {
-			fmt.Println(err)
-		}
-	})
+	r.GET("/fetch-osrs-data", itemHandler.FetchAndPersistItems)
 
-	r.GET("/search-item/:name", func(c *gin.Context) {
-		name := c.Param("name")
-		items, err := itemRepo.GetItem(name)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			fmt.Println(err)
-		}
-
-		c.JSON(http.StatusOK, items)
-	})
+	r.GET("/search-item/:name", itemHandler.SearchItems)
 
 	_ = r.Run(":8080")
 }
